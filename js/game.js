@@ -155,20 +155,21 @@ class MyModel {
         this.currTimeSeconds = currTime / 1000;
         this.player.update();
 
-        if (this.player.x <= 0 + this.player.radius) {
-            this.player.x = 0 + this.player.radius;
+        var playerSprite = this.player.sprite;
+        if (playerSprite.x <= 0 + playerSprite.radius) {
+            playerSprite.x = 0 + playerSprite.radius;
         }
 
-        if (this.player.y <= 0 + this.player.radius) {
-            this.player.y = 0 + this.player.radius;
+        if (playerSprite.y <= 0 + playerSprite.radius) {
+            playerSprite.y = 0 + playerSprite.radius;
         }
 
-        if (this.player.x >= this.width - this.player.radius) {
-            this.player.x = this.width - this.player.radius;
+        if (playerSprite.x >= this.width - playerSprite.radius) {
+            playerSprite.x = this.width - playerSprite.radius;
         }
 
-        if (this.player.y >= this.height - this.player.radius) {
-            this.player.y = this.height - this.player.radius;
+        if (playerSprite.y >= this.height - playerSprite.radius) {
+            playerSprite.y = this.height - playerSprite.radius;
         }
     }
 }
