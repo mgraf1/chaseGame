@@ -2,6 +2,7 @@ class GameEngine {
     startGame(app) {
 
         var self = this;
+        this.startTime = (new Date()).getTime();
 
         window.requestAnimFrame = (function (callback) {
             return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
@@ -11,21 +12,23 @@ class GameEngine {
         })();
 
         setTimeout(function () {
-            var startTime = (new Date()).getTime();
-            self.gameLoop(app);
+            self.gameLoop(app, self.startTime);
         }, 1000);
     }
 
-    gameLoop(app) {
+    gameLoop(app, lastTime) {
+        var currTime = lastTime - this.startTime;
+
         app.clearView();
         app.handleControls();
-        app.update();
+        app.update(currTime);
         app.render();
 
         // request new frame
         var self = this;
         requestAnimFrame(function () {
-            self.gameLoop(app);
+            var currTime = (new Date()).getTime();
+            self.gameLoop(app, currTime);
         });
     }
 }
@@ -41,9 +44,9 @@ class MyApp {
         this.controller.handleControls();
     }
 
-    update() {
+    update(currTime) {
         this.controller.updateModel(this.model);
-        this.model.update();
+        this.model.update(currTime);
     }
 
     render() {
@@ -141,13 +144,15 @@ class MyModel {
         this.width = width;
         this.height = height;
         this.sprites = sprites;
+        this.currTimeSeconds = 0;
     }
 
     updateControls(left, up, right, down) {
         this.player.setDirecton(left, up, right, down);
     }
 
-    update() {
+    update(currTime) {
+        this.currTimeSeconds = currTime / 1000;
         this.player.update();
 
         if (this.player.x <= 0 + this.player.radius) {
@@ -217,6 +222,11 @@ class MyView {
             }
         }
         
+        var textHeight = parseInt(MyView.TIMER_FONT);
+        this.context.clearRect(MyView.TIMER_LOCATION.x,
+                               MyView.TIMER_LOCATION.y - textHeight,
+                               200,
+                               textHeight);
     }
 
     renderModel(model) {
@@ -228,6 +238,9 @@ class MyView {
                 this.drawCircularSprite(currSprite);
             }
         }
+
+        this.context.font = MyView.TIMER_FONT;
+        this.context.fillText(model.currTimeSeconds, MyView.TIMER_LOCATION.x, MyView.TIMER_LOCATION.y);
     }
 
     drawCircularSprite(circularSprite) {
@@ -241,7 +254,24 @@ class MyView {
         this.context.clearRect(circularSprite.x - circularSprite.radius - 1, circularSprite.y - circularSprite.radius - 1,
           circularSprite.radius * 2 + 2, circularSprite.radius * 2 + 2);
     }
+
+    getTextWidth(text, font) {
+        this.context.font = font;
+        return this.context.measureText(text).width;
+    }
 }
+Object.defineProperty(MyView, 'TIMER_LOCATION', {
+    value: { x:10, y:30 },
+    writable: false,
+    enumerable: true,
+    configurable: false
+});
+Object.defineProperty(MyView, 'TIMER_FONT', {
+    value: "30px Arial",
+    writable: false,
+    enumerable: true,
+    configurable: false
+});
 
 class Player {
     constructor(sprite) {
@@ -262,7 +292,7 @@ main();
 function main() {
 
     // Starting parameters.
-    var PLAYER_START_X = 50;
+    var PLAYER_START_X = 10;
     var PLAYER_START_Y = 50;
     var PLAYER_RADIUS = 10;
     var PLAYER_START_SPEED = 2
