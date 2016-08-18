@@ -8,9 +8,9 @@ class MyView {
     }
 
     clearModel(model) {
-        var len = model.sprites.length;
+        var len = model.drawables.length;
         for (var i = 0; i < len; i++) {
-            var currSprite = model.sprites[i];
+            var currSprite = model.drawables[i].sprite;
 
             if (currSprite instanceof CircularSprite) {
                 this.clearCircularSprite(currSprite);
@@ -25,9 +25,9 @@ class MyView {
     }
 
     renderModel(model) {
-        var len = model.sprites.length;
+        var len = model.drawables.length;
         for (var i = 0; i < len; i++) {
-            var currSprite = model.sprites[i];
+            var currSprite = model.drawables[i].sprite;
 
             if (currSprite instanceof CircularSprite) {
                 this.drawCircularSprite(currSprite);

@@ -74,10 +74,12 @@ function main() {
     var controller = new MyController();
 
     // Game model.
+    var collisionHandler = new CollisionHandler();
+    var collisionDetector = new CollisionDetector(collisionHandler);
     var playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS);
     var player = new Player(playerSprite);
-    sprites = [player.sprite];
-    var model = new MyModel(GAME_WIDTH, GAME_HEIGHT, player, sprites);
+    var drawables = [player];
+    var model = new MyModel(collisionDetector, GAME_WIDTH, GAME_HEIGHT, player, drawables);
 
     // Game view.
     var view = new MyView(GAME_WIDTH, GAME_HEIGHT);

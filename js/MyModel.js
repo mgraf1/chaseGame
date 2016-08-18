@@ -1,10 +1,12 @@
 class MyModel {
-    constructor(width, height, player, sprites) {
+    constructor(collisionDetector, width, height, player, drawables) {
+        this.collisionDetector = collisionDetector;
         this.player = player;
         this.width = width;
         this.height = height;
-        this.sprites = sprites;
+        this.drawables = drawables;
         this.currTimeSeconds = 0;
+        this.recentlySpawned = true;
     }
 
     updateControls(left, up, right, down) {
@@ -12,8 +14,20 @@ class MyModel {
     }
 
     update(currTime) {
+
+        //console.log(currTime % MyModel.BAD_GUY_SPAWN_TIMER);
+        if (currTime % MyModel.BAD_GUY_SPAWN_TIMER < 100 && !this.recentlySpawned) {
+            this.spawnBadGuy();
+            this.recentlySpawned = true;
+        }
+        else if (currTime % MyModel.BAD_GUY_SPAWN_TIMER > 4000) {
+            this.recentlySpawned = false;
+        }
+
         this.currTimeSeconds = currTime / 1000;
         this.player.update();
+
+        this.collisionDetector.detectCollisions(this.drawables);
 
         var playerSprite = this.player.sprite;
         if (playerSprite.x <= 0 + playerSprite.radius) {
@@ -32,11 +46,35 @@ class MyModel {
             playerSprite.y = this.height - playerSprite.radius;
         }
     }
+
+    spawnBadGuy() {
+        var x = Math.random() * this.width;
+        var y = Math.random() * this.height;
+        var speed = 2;
+        var radius = 10;
+
+        var sprite = new CircularSprite(x, y, speed, radius);
+        var badGuy = new BadGuy(sprite);
+        this.drawables.push(badGuy);
+    }
+}
+Object.defineProperty(MyModel, 'BAD_GUY_SPAWN_TIMER', {
+    value: 5000,
+    writable: false,
+    enumerable: true,
+    configurable: false
+});
+
+class BadGuy {
+    constructor(sprite) {
+        this.sprite = sprite;
+    }  
 }
 
 class Player {
     constructor(sprite) {
         this.sprite = sprite;
+        this.isDead = false;
     }
 
     setDirecton(left, up, right, down) {
@@ -45,6 +83,10 @@ class Player {
 
     update() {
         this.sprite.update();
+    }
+
+    die() {
+        this.isDead = true;
     }
 }
 
@@ -75,5 +117,52 @@ class CircularSprite extends Sprite {
     constructor(x, y, speed, radius) {
         super(x, y, speed);
         this.radius = radius;
+    }
+}
+
+class CollisionDetector {
+    constructor(collisionHandler) {
+        this.collisionHandler = collisionHandler;
+    }
+
+    detectCollisions(drawables) {
+        var len = drawables.length;
+        for (var i = 0; i < len; i++) {
+
+            var currSprite = drawables[i].sprite;
+            for (var j = 0; j < len; j++) {
+
+                var otherSprite = drawables[j].sprite;
+                if (currSprite !== otherSprite) {
+                    var distance = this.getDistance(currSprite.x, currSprite.y, otherSprite.x, otherSprite.y);
+                    if (distance < (currSprite.radius + otherSprite.radius)) {
+                        this.collisionHandler.handleCollision(drawables[i], drawables[j]);
+                    }
+                }
+            }
+        }
+    }
+
+    getDistance(x1, y1, x2, y2) {
+        return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    }
+}
+
+class CollisionHandler {
+    handleCollision(drawable1, drawable2) {
+        var player = null;
+        var other = null;
+        if (drawable1 instanceof Player) {
+            player = drawable1;
+            other = drawable2;
+        }
+        else if (drawable2 instanceof Player) {
+            player = drawable2;
+            other = drawable1;
+        }
+
+        if (player != null) {
+            player.die();
+        }
     }
 }
