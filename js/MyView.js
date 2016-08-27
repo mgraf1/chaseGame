@@ -71,3 +71,11 @@ Object.defineProperty(MyView, 'TIMER_FONT', {
     enumerable: true,
     configurable: false
 });
+
+class GameOverView {
+    constructor() {
+        this.canvas = document.getElementById("myCanvas");
+        this.context = this.canvas.getContext("2d");
+        this.canvas.style.background = 'red';
+    }
+}

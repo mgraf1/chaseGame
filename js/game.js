@@ -8,6 +8,8 @@ class GameEngine {
         var self = this;
         this.startTime = (new Date()).getTime();
 
+        app.begin();
+
         window.requestAnimFrame = (function (callback) {
             return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
               function (callback) {
@@ -48,37 +50,37 @@ class EventHandler {
 }
 
 class MyApp {
-    constructor(model, view, controller) {
-        this.model = model;
-        this.view = view;
-        this.controller = controller;
+    constructor(gameStateFactory, gameStateManager) {
+        this.gameStateFactory = gameStateFactory;
+        this.gameStateManager = gameStateManager;
+    }
 
-        var boundEndGameFunction = this.endGame.bind(this);
+    begin() {
+        var playGameState = this.gameStateFactory.createState(GameState.PLAY_STATE);
 
-        this.model.registerPlayerIsDeadEvent(new EventHandler(boundEndGameFunction));
+        var endGameHandler = function () {
+            var gameOverState = this.gameStateFactory.createState(GameState.GAME_OVER_STATE);
+            this.gameStateManager.setState(gameOverState);
+        }.bind(this);
+
+        playGameState.setEndGameFunction(endGameHandler);
+        this.gameStateManager.setState(playGameState);
     }
 
     handleControls() {
-        this.controller.handleControls();
+        this.gameStateManager.handleControls();
     }
 
     update(currTime) {
-        this.controller.updateModel(this.model);
-        this.model.update(currTime);
+        this.gameStateManager.update(currTime);
     }
 
     render() {
-        this.view.renderModel(this.model);
+        this.gameStateManager.render();
     }
 
     clearView() {
-        this.view.clearModel(this.model);
-    }
-
-    endGame() {
-        this.view.clearModel(this.model);
-        this.view.showEndGameScreen();
-        
+        this.gameStateManager.clearView();
     }
 }
 
@@ -86,30 +88,11 @@ main();
 
 function main() {
 
-    // Starting parameters.
-    var PLAYER_START_X = 10;
-    var PLAYER_START_Y = 50;
-    var PLAYER_RADIUS = 10;
-    var PLAYER_START_SPEED = 2
-    var GAME_WIDTH = 640;
-    var GAME_HEIGHT = 480;
-
-    // Game controller;
-    var controller = new MyController();
-
-    // Game model.
-    var collisionHandler = new CollisionHandler();
-    var collisionDetector = new CollisionDetector(collisionHandler);
-    var playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS);
-    var player = new Player(playerSprite);
-    var drawables = [player];
-    var model = new MyModel(collisionDetector, GAME_WIDTH, GAME_HEIGHT, player, drawables);
-
-    // Game view.
-    var view = new MyView(GAME_WIDTH, GAME_HEIGHT);
+    var gameStateFactory = new GameStateFactory();
+    var gameStateManager = new GameStateManager();
 
     // The app to run inside the engine.
-    var app = new MyApp(model, view, controller);
+    var app = new MyApp(gameStateFactory, gameStateManager);
 
     // Start the game engine.
     var engine = new GameEngine();
