@@ -1,4 +1,8 @@
 class GameEngine {
+    constructor() {
+        this.requestAnimId = 0;
+    }
+
     startGame(app) {
 
         var self = this;
@@ -26,10 +30,20 @@ class GameEngine {
 
         // request new frame
         var self = this;
-        requestAnimFrame(function () {
+        this.requestAnimId = requestAnimFrame(function () {
             var currTime = (new Date()).getTime();
             self.gameLoop(app, currTime);
         });
+    }
+}
+
+class EventHandler {
+    constructor(action) {
+        this.action = action;
+    }
+
+    handleEvent() {
+        this.action();
     }
 }
 
@@ -38,6 +52,10 @@ class MyApp {
         this.model = model;
         this.view = view;
         this.controller = controller;
+
+        var boundEndGameFunction = this.endGame.bind(this);
+
+        this.model.registerPlayerIsDeadEvent(new EventHandler(boundEndGameFunction));
     }
 
     handleControls() {
@@ -55,6 +73,12 @@ class MyApp {
 
     clearView() {
         this.view.clearModel(this.model);
+    }
+
+    endGame() {
+        this.view.clearModel(this.model);
+        this.view.showEndGameScreen();
+        
     }
 }
 

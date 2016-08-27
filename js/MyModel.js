@@ -7,15 +7,19 @@ class MyModel {
         this.drawables = drawables;
         this.currTimeSeconds = 0;
         this.recentlySpawned = true;
+        this.endGameAction = null;
     }
 
     updateControls(left, up, right, down) {
         this.player.setDirecton(left, up, right, down);
     }
 
+    registerPlayerIsDeadEvent(eventHandler) {
+        this.player.isDeadListeners.push(eventHandler);
+    }
+
     update(currTime) {
 
-        //console.log(currTime % MyModel.BAD_GUY_SPAWN_TIMER);
         if (currTime % MyModel.BAD_GUY_SPAWN_TIMER < 100 && !this.recentlySpawned) {
             this.spawnBadGuy();
             this.recentlySpawned = true;
@@ -75,6 +79,7 @@ class Player {
     constructor(sprite) {
         this.sprite = sprite;
         this.isDead = false;
+        this.isDeadListeners = [];
     }
 
     setDirecton(left, up, right, down) {
@@ -86,7 +91,7 @@ class Player {
     }
 
     die() {
-        this.isDead = true;
+        this.isDeadListeners.forEach(l => l.handleEvent());
     }
 }
 

@@ -54,6 +54,10 @@ class MyView {
         this.context.font = font;
         return this.context.measureText(text).width;
     }
+
+    showEndGameScreen() {
+        this.canvas.style.background = 'red';
+    }
 }
 Object.defineProperty(MyView, 'TIMER_LOCATION', {
     value: { x:10, y:30 },
