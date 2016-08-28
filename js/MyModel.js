@@ -1,6 +1,8 @@
 class MyModel {
-    constructor(collisionDetector, width, height, player, drawables) {
+    constructor(collisionDetector, badGuyFactory, width, height, player, drawables) {
         this.collisionDetector = collisionDetector;
+        this.badGuyFactory = badGuyFactory;
+        this.badGuys = [];
         this.player = player;
         this.width = width;
         this.height = height;
@@ -29,6 +31,7 @@ class MyModel {
         }
 
         this.currTimeSeconds = currTime / 1000;
+        this.updateBadGuys();
         this.player.update();
 
         this.collisionDetector.detectCollisions(this.drawables);
@@ -51,29 +54,17 @@ class MyModel {
         }
     }
 
-    spawnBadGuy() {
-        var x = Math.random() * this.width;
-        var y = Math.random() * this.height;
-        var speed = 2;
-        var radius = 10;
+    updateBadGuys() {
+        this.badGuys.forEach(bg => bg.updatePosition());
+    }
 
-        var sprite = new CircularSprite(x, y, speed, radius);
-        var badGuy = new BadGuy(sprite);
+    spawnBadGuy() {
+        var badGuy = this.badGuyFactory.createBadGuy("CHASE_BAD_GUY", this.width, this.height);
+        this.badGuys.push(badGuy);
         this.drawables.push(badGuy);
     }
 }
-Object.defineProperty(MyModel, 'BAD_GUY_SPAWN_TIMER', {
-    value: 5000,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
-
-class BadGuy {
-    constructor(sprite) {
-        this.sprite = sprite;
-    }  
-}
+MyModel. BAD_GUY_SPAWN_TIMER = 5000;
 
 class Player {
     constructor(sprite) {

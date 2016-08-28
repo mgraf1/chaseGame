@@ -47,18 +47,8 @@ class PlayGameState {
 }
 
 class GameState { }
-Object.defineProperty(GameState, 'PLAY_STATE', {
-    value: 1,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
-Object.defineProperty(GameState, 'GAME_OVER_STATE', {
-    value: 2,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
+GameState.PLAY_STATE = 1;
+GameState.GAME_OVER_STATE = 2;
 
 class GameStateFactory {
     createState(state) {
@@ -81,7 +71,8 @@ class GameStateFactory {
             var playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS);
             var player = new Player(playerSprite);
             var drawables = [player];
-            var model = new MyModel(collisionDetector, GAME_WIDTH, GAME_HEIGHT, player, drawables);
+            var badGuyFactory = new BadGuyFactory(player);
+            var model = new MyModel(collisionDetector, badGuyFactory, GAME_WIDTH, GAME_HEIGHT, player, drawables);
 
             // Game view.
             var view = new MyView(GAME_WIDTH, GAME_HEIGHT);

@@ -1,29 +1,9 @@
 class KeyConstants {
 }
-Object.defineProperty(KeyConstants, 'LEFT_KEY', {
-    value: 37,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
-Object.defineProperty(KeyConstants, 'UP_KEY', {
-    value: 38,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
-Object.defineProperty(KeyConstants, 'RIGHT_KEY', {
-    value: 39,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
-Object.defineProperty(KeyConstants, 'DOWN_KEY', {
-    value: 40,
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
+KeyConstants.LEFT_KEY = 37;
+KeyConstants.UP_KEY = 38;
+KeyConstants.RIGHT_KEY = 39;
+KeyConstants.DOWN_KEY = 40;
 
 class MyController {
 

@@ -59,18 +59,8 @@ class MyView {
         this.canvas.style.background = 'red';
     }
 }
-Object.defineProperty(MyView, 'TIMER_LOCATION', {
-    value: { x:10, y:30 },
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
-Object.defineProperty(MyView, 'TIMER_FONT', {
-    value: "30px Arial",
-    writable: false,
-    enumerable: true,
-    configurable: false
-});
+MyView.TIMER_LOCATION = { x:10, y:30 };
+MyView.TIMER_FONT = "30px Arial";
 
 class GameOverView {
     constructor() {
