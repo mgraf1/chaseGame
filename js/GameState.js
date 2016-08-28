@@ -61,6 +61,7 @@ class GameStateFactory {
             var PLAYER_START_SPEED = 2
             var GAME_WIDTH = 640;
             var GAME_HEIGHT = 480;
+            var PLAYER_COLOR = 'white';
 
             // Game controller;
             var controller = new MyController();
@@ -68,7 +69,7 @@ class GameStateFactory {
             // Game model.
             var collisionHandler = new CollisionHandler();
             var collisionDetector = new CollisionDetector(collisionHandler);
-            var playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS);
+            var playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS, PLAYER_COLOR);
             var player = new Player(playerSprite);
             var drawables = [player];
             var badGuyFactory = new BadGuyFactory(player);

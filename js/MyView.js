@@ -25,6 +25,8 @@ class MyView {
     }
 
     renderModel(model) {
+        this.renderTimer(model);
+        
         var len = model.drawables.length;
         for (var i = 0; i < len; i++) {
             var currSprite = model.drawables[i].sprite;
@@ -33,13 +35,16 @@ class MyView {
                 this.drawCircularSprite(currSprite);
             }
         }
+    }
 
+    renderTimer(model) {
+        this.context.fillStyle = 'white';
         this.context.font = MyView.TIMER_FONT;
         this.context.fillText(model.currTimeSeconds, MyView.TIMER_LOCATION.x, MyView.TIMER_LOCATION.y);
     }
 
     drawCircularSprite(circularSprite) {
-        this.context.fillStyle = 'white';
+        this.context.fillStyle = circularSprite.color;
         this.context.beginPath();
         this.context.arc(circularSprite.x, circularSprite.y, circularSprite.radius, 0, 2 * Math.PI);
         this.context.fill();

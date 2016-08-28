@@ -101,18 +101,23 @@ class Sprite {
     }
 
     update() {
-        var vX = this.dX * this.speed;
-        var vY = this.dY * this.speed;
 
-        this.x += vX;
-        this.y += vY;
+        let sqrt = Math.sqrt((this.dX * this.dX) + (this.dY * this.dY));
+
+        if (sqrt !== 0) {
+            let vX = (this.dX / sqrt) * this.speed;
+            let vY = (this.dY / sqrt) * this.speed;
+            this.x += vX;
+            this.y += vY;
+        }
     }
 }
 
 class CircularSprite extends Sprite {
-    constructor(x, y, speed, radius) {
+    constructor(x, y, speed, radius, color) {
         super(x, y, speed);
         this.radius = radius;
+        this.color = color;
     }
 }
 

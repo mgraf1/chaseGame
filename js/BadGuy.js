@@ -8,11 +8,20 @@ class BadGuyFactory {
             // Starting stats.
             var x = Math.random() * maxWidth;
             var y = Math.random() * maxHeight;
-            var speed = 2;
+            var speed = Math.random() * BadGuyFactory.CHASE_MAX_SPEED;
             var radius = 10;
 
             // Sprite.
-            var sprite = new CircularSprite(x, y, speed, radius);
+            let spriteColor;
+            if (speed < 1) {
+                spriteColor = 'gray';
+            } else if (speed < 1.5) {
+                spriteColor = 'pink';
+            }
+            else {
+                spriteColor = 'red';
+            }
+            var sprite = new CircularSprite(x, y, speed, radius, spriteColor);
 
             // Movement behavior (AI).
             var movementBehavior = new ChaseMovementBehavior(sprite, this.player);
@@ -22,6 +31,7 @@ class BadGuyFactory {
         }
     }
 }
+BadGuyFactory.CHASE_MAX_SPEED = 1.9;
 
 class ChaseBadGuy {
     constructor(sprite, movementBehavior) {
@@ -49,10 +59,8 @@ class ChaseMovementBehavior extends BadGuyMovementBehavior {
         let vecX = this.player.sprite.x - this.sprite.x;
         let vecY = this.player.sprite.y - this.sprite.y;
 
-        let sqrt = Math.sqrt((vecX * vecX) + (vecY * vecY));
-
-        this.sprite.dX = vecX / sqrt;
-        this.sprite.dY = vecY / sqrt;
+        this.sprite.dX = vecX;
+        this.sprite.dY = vecY;
         this.sprite.update();
     }
 }
