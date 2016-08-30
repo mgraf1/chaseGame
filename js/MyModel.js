@@ -30,11 +30,11 @@ class MyModel {
             this.recentlySpawned = false;
         }
 
+        this.collisionDetector.detectCollisions(this.drawables);
+
         this.currTimeSeconds = currTime / 1000;
         this.updateBadGuys();
         this.player.update();
-
-        this.collisionDetector.detectCollisions(this.drawables);
 
         var playerSprite = this.player.sprite;
         if (playerSprite.x <= 0 + playerSprite.radius) {
@@ -102,11 +102,10 @@ class Sprite {
 
     update() {
 
-        let sqrt = Math.sqrt((this.dX * this.dX) + (this.dY * this.dY));
-
-        if (sqrt !== 0) {
-            let vX = (this.dX / sqrt) * this.speed;
-            let vY = (this.dY / sqrt) * this.speed;
+        let normalizedVector = Util.normalize(this.dX, this.dY);
+        if (normalizedVector) {
+            let vX = normalizedVector.x * this.speed;
+            let vY = normalizedVector.y * this.speed;
             this.x += vX;
             this.y += vY;
         }
@@ -156,10 +155,18 @@ class CollisionHandler {
         if (drawable1 instanceof Player) {
             player = drawable1;
             other = drawable2;
-        }
-        else if (drawable2 instanceof Player) {
+        } else if (drawable2 instanceof Player) {
             player = drawable2;
             other = drawable1;
+        } else {
+            let vecX = drawable1.sprite.x - drawable2.sprite.x;
+            let vecY = drawable1.sprite.y - drawable2.sprite.y;
+
+            let  normalizedVector = Util.normalize(vecX, vecY);
+            if (normalizedVector) {
+                drawable1.sprite.x += normalizedVector.x;
+                drawable1.sprite.y += normalizedVector.y;
+            }
         }
 
         if (player != null) {
