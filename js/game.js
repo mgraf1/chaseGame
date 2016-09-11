@@ -23,7 +23,7 @@ class GameEngine {
     }
 
     gameLoop(app, lastTime) {
-        var currTime = lastTime - this.startTime;
+        var currTime = (lastTime - this.startTime) / 1000;
 
         app.clearView();
         app.handleControls();
@@ -44,8 +44,8 @@ class EventHandler {
         this.action = action;
     }
 
-    handleEvent() {
-        this.action();
+    handleEvent(time) {
+        this.action(time);
     }
 }
 
@@ -56,10 +56,10 @@ class MyApp {
     }
 
     begin() {
-        var playGameState = this.gameStateFactory.createState(GameState.PLAY_STATE);
+        var playGameState = this.gameStateFactory.createState(GameState.PLAY_STATE, 0);
 
-        var endGameHandler = function () {
-            var gameOverState = this.gameStateFactory.createState(GameState.GAME_OVER_STATE);
+        var endGameHandler = function (time) {
+            var gameOverState = this.gameStateFactory.createState(GameState.GAME_OVER_STATE, time);
             this.gameStateManager.setState(gameOverState);
         }.bind(this);
 

@@ -22,17 +22,18 @@ class MyModel {
 
     update(currTime) {
 
-        if (currTime % MyModel.BAD_GUY_SPAWN_TIMER < 100 && !this.recentlySpawned) {
+        let timeUntilSpawn = currTime % MyModel.BAD_GUY_SPAWN_TIMER;
+        if (timeUntilSpawn < .1 && !this.recentlySpawned) {
             this.spawnBadGuy();
             this.recentlySpawned = true;
         }
-        else if (currTime % MyModel.BAD_GUY_SPAWN_TIMER > 4000) {
+        else if (timeUntilSpawn > MyModel.BAD_GUY_SPAWN_TIMER - 1) {
             this.recentlySpawned = false;
         }
 
-        this.collisionDetector.detectCollisions(this.drawables);
+        this.collisionDetector.detectCollisions(this.drawables, currTime);
 
-        this.currTimeSeconds = currTime / 1000;
+        this.currTimeSeconds = currTime;
         this.updateBadGuys();
         this.player.update();
 
@@ -64,7 +65,7 @@ class MyModel {
         this.drawables.push(badGuy);
     }
 }
-MyModel. BAD_GUY_SPAWN_TIMER = 5000;
+MyModel. BAD_GUY_SPAWN_TIMER = 5;
 
 class Player {
     constructor(sprite) {
@@ -81,8 +82,8 @@ class Player {
         this.sprite.update();
     }
 
-    die() {
-        this.isDeadListeners.forEach(l => l.handleEvent());
+    die(time) {
+        this.isDeadListeners.forEach(l => l.handleEvent(time));
     }
 }
 
@@ -125,7 +126,7 @@ class CollisionDetector {
         this.collisionHandler = collisionHandler;
     }
 
-    detectCollisions(drawables) {
+    detectCollisions(drawables, time) {
         var len = drawables.length;
         for (var i = 0; i < len; i++) {
 
@@ -136,7 +137,7 @@ class CollisionDetector {
                 if (currSprite !== otherSprite) {
                     var distance = this.getDistance(currSprite.x, currSprite.y, otherSprite.x, otherSprite.y);
                     if (distance < (currSprite.radius + otherSprite.radius)) {
-                        this.collisionHandler.handleCollision(drawables[i], drawables[j]);
+                        this.collisionHandler.handleCollision(drawables[i], drawables[j], time);
                     }
                 }
             }
@@ -149,7 +150,7 @@ class CollisionDetector {
 }
 
 class CollisionHandler {
-    handleCollision(drawable1, drawable2) {
+    handleCollision(drawable1, drawable2, time) {
         var player = null;
         var other = null;
         if (drawable1 instanceof Player) {
@@ -170,7 +171,7 @@ class CollisionHandler {
         }
 
         if (player != null) {
-            player.die();
+            player.die(time);
         }
     }
 }

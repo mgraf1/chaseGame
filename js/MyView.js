@@ -38,39 +38,75 @@ class MyView {
     }
 
     renderTimer(model) {
+        this.context.beginPath();
         this.context.fillStyle = 'white';
         this.context.font = MyView.TIMER_FONT;
         this.context.fillText(model.currTimeSeconds, MyView.TIMER_LOCATION.x, MyView.TIMER_LOCATION.y);
+        this.context.closePath();
     }
 
     drawCircularSprite(circularSprite) {
-        this.context.fillStyle = circularSprite.color;
         this.context.beginPath();
+        this.context.fillStyle = circularSprite.color;
         this.context.arc(circularSprite.x, circularSprite.y, circularSprite.radius, 0, 2 * Math.PI);
         this.context.fill();
+        this.context.closePath();
     }
 
     clearCircularSprite(circularSprite) {
         this.context.clearRect(circularSprite.x - circularSprite.radius - 1, circularSprite.y - circularSprite.radius - 1,
           circularSprite.radius * 2 + 2, circularSprite.radius * 2 + 2);
     }
-
-    getTextWidth(text, font) {
-        this.context.font = font;
-        return this.context.measureText(text).width;
-    }
-
-    showEndGameScreen() {
-        this.canvas.style.background = 'red';
-    }
 }
 MyView.TIMER_LOCATION = { x:10, y:30 };
 MyView.TIMER_FONT = "30px Arial";
 
 class GameOverView {
-    constructor() {
+    constructor(width, height, currentTime) {
         this.canvas = document.getElementById("myCanvas");
         this.context = this.canvas.getContext("2d");
         this.canvas.style.background = 'red';
+        this.width = width;
+        this.height = height;
+        this.currentTime = currentTime;
+        this.restartButtonX = (GameStateFactory.GAME_WIDTH / 2) - (GameOverView.BUTTON_DIM.w / 2);
+        this.restartButtonY = (GameStateFactory.GAME_HEIGHT / 2) - (GameOverView.BUTTON_DIM.h / 2);
+    }
+
+    render() {
+        this.renderRestartButton();
+        this.renderScore();
+    }
+
+    clear() {
+        this.clearRestartButton();
+    }
+
+    renderRestartButton() {
+        this.context.beginPath();
+        this.context.fillStyle = 'black';
+        this.context.rect(
+            this.restartButtonX, 
+            this.restartButtonY, 
+            GameOverView.BUTTON_DIM.w, 
+            GameOverView.BUTTON_DIM.h);
+        this.context.fill();
+        this.context.closePath();
+    }
+
+    renderScore() {
+        this.context.beginPath();
+        this.context.fillStyle = 'white';
+        this.context.font = GameOverView.FONT;
+        this.context.fillText("Score: " + this.currentTime,
+            this.restartButtonX,
+            this.restartButtonY);
+        this.context.closePath();
+    }
+
+    clearRestartButton() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
+GameOverView.FONT = "30px Arial";
+GameOverView.BUTTON_DIM = { w: 300, h: 150 };

@@ -7,11 +7,11 @@ class GameOverState {
     update(currTime) { }
 
     render() {
-
+        this.view.render();
     }
 
     clearView() {
-
+        this.view.clear();
     }
 }
 
@@ -51,7 +51,7 @@ GameState.PLAY_STATE = 1;
 GameState.GAME_OVER_STATE = 2;
 
 class GameStateFactory {
-    createState(state) {
+    createState(state, time) {
         if (state === GameState.PLAY_STATE) {
 
             // Starting parameters.
@@ -59,8 +59,6 @@ class GameStateFactory {
             var PLAYER_START_Y = 50;
             var PLAYER_RADIUS = 10;
             var PLAYER_START_SPEED = 2
-            var GAME_WIDTH = 640;
-            var GAME_HEIGHT = 480;
             var PLAYER_COLOR = 'white';
 
             // Game controller;
@@ -73,21 +71,25 @@ class GameStateFactory {
             var player = new Player(playerSprite);
             var drawables = [player];
             var badGuyFactory = new BadGuyFactory(player);
-            var model = new MyModel(collisionDetector, badGuyFactory, GAME_WIDTH, GAME_HEIGHT, player, drawables);
+            var model = new MyModel(collisionDetector, badGuyFactory, 
+                GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, 
+                player, drawables);
 
             // Game view.
-            var view = new MyView(GAME_WIDTH, GAME_HEIGHT);
+            var view = new MyView(  GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT);
 
             return new PlayGameState(model, view, controller);
 
         } else if (state === GameState.GAME_OVER_STATE) {
 
-            var view = new GameOverView();
+            var view = new GameOverView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, time);
 
             return new GameOverState(view);
         }
     }
 }
+GameStateFactory.GAME_WIDTH = 640;
+GameStateFactory.GAME_HEIGHT = 480;
 
 class GameStateManager {
     constructor() {
