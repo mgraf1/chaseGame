@@ -65,7 +65,7 @@ class MyModel {
         this.drawables.push(badGuy);
     }
 }
-MyModel. BAD_GUY_SPAWN_TIMER = 5;
+MyModel. BAD_GUY_SPAWN_TIMER = 3;
 
 class Player {
     constructor(sprite) {

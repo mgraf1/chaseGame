@@ -71,6 +71,8 @@ class GameOverView {
         this.currentTime = currentTime;
         this.restartButtonX = (GameStateFactory.GAME_WIDTH / 2) - (GameOverView.BUTTON_DIM.w / 2);
         this.restartButtonY = (GameStateFactory.GAME_HEIGHT / 2) - (GameOverView.BUTTON_DIM.h / 2);
+        this.restartButtonTextX = this.restartButtonX + 50;
+        this.restartButtonTextY = this.restartButtonY + 50;
     }
 
     render() {
@@ -82,7 +84,16 @@ class GameOverView {
         this.clearRestartButton();
     }
 
+    isInsideButton(mouseLocation) {
+        return mouseLocation.x > this.restartButtonX 
+            && mouseLocation.x < (this.restartButtonX + GameOverView.BUTTON_DIM.w)
+            &&  mouseLocation.y > this.restartButtonY 
+            && mouseLocation.y < (this.restartButtonY + GameOverView.BUTTON_DIM.h);
+    }
+
     renderRestartButton() {
+
+        // Button background.
         this.context.beginPath();
         this.context.fillStyle = 'black';
         this.context.rect(
@@ -92,6 +103,15 @@ class GameOverView {
             GameOverView.BUTTON_DIM.h);
         this.context.fill();
         this.context.closePath();
+    
+        // Button text.
+        this.context.beginPath();
+        this.context.fillStyle = 'red';
+        this.context.font = GameOverView.FONT;
+        this.context.fillText("Play again?",
+            this.restartButtonTextX,
+            this.restartButtonTextY);
+        this.context.closePath();
     }
 
     renderScore() {
@@ -100,7 +120,7 @@ class GameOverView {
         this.context.font = GameOverView.FONT;
         this.context.fillText("Score: " + this.currentTime,
             this.restartButtonX,
-            this.restartButtonY);
+            this.restartButtonY - 10);
         this.context.closePath();
     }
 
@@ -109,4 +129,4 @@ class GameOverView {
     }
 }
 GameOverView.FONT = "30px Arial";
-GameOverView.BUTTON_DIM = { w: 300, h: 150 };
+GameOverView.BUTTON_DIM = { w: 250, h: 75 };

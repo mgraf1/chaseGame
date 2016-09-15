@@ -1,9 +1,16 @@
 class GameOverState {
-    constructor(view) {
+    constructor(controller, view) {
+        this.controller = controller;
         this.view = view;
     }
 
-    handleControls() { }
+    handleControls() { 
+        if (this.controller.mouseUp && this.view.isInsideButton(this.controller.mouseLocation)) {
+            console.log("!");
+            this.controller.mouseUp = false;
+        }
+    }
+
     update(currTime) { }
 
     render() {
@@ -84,7 +91,9 @@ class GameStateFactory {
 
             var view = new GameOverView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, time);
 
-            return new GameOverState(view);
+            var controller = new GameOverController();
+
+            return new GameOverState(controller, view);
         }
     }
 }

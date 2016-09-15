@@ -4,6 +4,7 @@ KeyConstants.LEFT_KEY = 37;
 KeyConstants.UP_KEY = 38;
 KeyConstants.RIGHT_KEY = 39;
 KeyConstants.DOWN_KEY = 40;
+KeyConstants.LEFT_MOUSE = 0;
 
 class MyController {
 
@@ -55,5 +56,29 @@ class MyController {
         trackedKeys[KeyConstants.RIGHT_KEY] = false;
         trackedKeys[KeyConstants.DOWN_KEY] = false;
         return trackedKeys
+    }
+}
+
+class GameOverController {
+    constructor() {
+        var self = this;
+        this.canvas = document.getElementById("myCanvas");
+        this.mouseUp = false;
+        this.mouseLocation = { x: 0, y: 0};
+
+        window.addEventListener("mousedown", function (event) {
+            if (event.button == KeyConstants.LEFT_MOUSE) {
+                self.mouseUp = false;
+            }
+        });
+
+        window.addEventListener("mouseup", function (event) {
+            if (event.button == KeyConstants.LEFT_MOUSE) {
+                self.mouseUp = true;
+                var rect = self.canvas.getBoundingClientRect();
+                self.mouseLocation.x = event.clientX - rect.left;
+                self.mouseLocation.y = event.clientY - rect.top;
+            }
+        });
     }
 }
