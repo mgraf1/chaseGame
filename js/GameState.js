@@ -1,5 +1,12 @@
-class GameOverState {
-    constructor(controller, view) {
+class GameState {
+    constructor(app){ 
+        this.app = app;
+    }
+}
+
+class GameOverState extends GameState {
+    constructor(controller, view, app) {
+        super(app);
         this.controller = controller;
         this.view = view;
     }
@@ -22,17 +29,13 @@ class GameOverState {
     }
 }
 
-class PlayGameState {
-    constructor(model, view, controller) {
+class PlayGameState extends GameState {
+    constructor(model, view, controller, app) {
+        super(app);
         this.model = model;
         this.view = view;
         this.controller = controller;
-        this.endGameFunction = null;
-    }
-
-    setEndGameFunction(endGameFunction) {
-        this.endGameFunction = endGameFunction;
-        this.model.registerPlayerIsDeadEvent(new EventHandler(endGameFunction));
+        this.model.registerPlayerIsDeadEvent(new EventHandler(this.app.endGame.bind(this.app)));
     }
 
     handleControls() {
@@ -53,13 +56,13 @@ class PlayGameState {
     }
 }
 
-class GameState { }
-GameState.PLAY_STATE = 1;
-GameState.GAME_OVER_STATE = 2;
+class GameStateConstants {}
+GameStateConstants.PLAY_STATE = 1;
+GameStateConstants.GAME_OVER_STATE = 2;
 
 class GameStateFactory {
-    createState(state, time) {
-        if (state === GameState.PLAY_STATE) {
+    createState(state, app, time) {
+        if (state === GameStateConstants.PLAY_STATE) {
 
             // Starting parameters.
             var PLAYER_START_X = 10;
@@ -83,17 +86,17 @@ class GameStateFactory {
                 player, drawables);
 
             // Game view.
-            var view = new MyView(  GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT);
+            var view = new MyView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT);
 
-            return new PlayGameState(model, view, controller);
+            return new PlayGameState(model, view, controller, app);
 
-        } else if (state === GameState.GAME_OVER_STATE) {
+        } else if (state === GameStateConstants.GAME_OVER_STATE) {
 
             var view = new GameOverView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, time);
 
             var controller = new GameOverController();
 
-            return new GameOverState(controller, view);
+            return new GameOverState(controller, view, app);
         }
     }
 }
@@ -106,11 +109,12 @@ class GameStateManager {
     }
 
     setState(state) {
+        this.gameStates.pop();
         this.gameStates.push(state);
     }
 
-    removeState() {
-        this.gameStates.pop();
+    setStateOnTop(state) {
+        this.gameStates.push(state);
     }
 
     handleControls() {

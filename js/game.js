@@ -53,17 +53,12 @@ class MyApp {
     constructor(gameStateFactory, gameStateManager) {
         this.gameStateFactory = gameStateFactory;
         this.gameStateManager = gameStateManager;
+        this.transitionMap = {};
+        this.currTime = 0;
     }
 
     begin() {
-        var playGameState = this.gameStateFactory.createState(GameState.PLAY_STATE, 0);
-
-        var endGameHandler = function (time) {
-            var gameOverState = this.gameStateFactory.createState(GameState.GAME_OVER_STATE, time);
-            this.gameStateManager.setState(gameOverState);
-        }.bind(this);
-
-        playGameState.setEndGameFunction(endGameHandler);
+        let playGameState = this.gameStateFactory.createState(GameStateConstants.PLAY_STATE, this);
         this.gameStateManager.setState(playGameState);
     }
 
@@ -72,6 +67,7 @@ class MyApp {
     }
 
     update(currTime) {
+        this.currTime = currTime;
         this.gameStateManager.update(currTime);
     }
 
@@ -81,6 +77,11 @@ class MyApp {
 
     clearView() {
         this.gameStateManager.clearView();
+    }
+
+    endGame() {
+        let gameOverState = this.gameStateFactory.createState(GameStateConstants.GAME_OVER_STATE, this, this.currTime);
+        this.gameStateManager.setState(gameOverState);
     }
 }
 
