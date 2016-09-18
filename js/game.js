@@ -6,7 +6,6 @@ class GameEngine {
     startGame(app) {
 
         var self = this;
-        this.startTime = (new Date()).getTime();
 
         app.begin();
 
@@ -23,18 +22,16 @@ class GameEngine {
     }
 
     gameLoop(app, lastTime) {
-        var currTime = (lastTime - this.startTime) / 1000;
 
         app.clearView();
         app.handleControls();
-        app.update(currTime);
+        app.update();
         app.render();
 
         // request new frame
         var self = this;
         this.requestAnimId = requestAnimFrame(function () {
-            var currTime = (new Date()).getTime();
-            self.gameLoop(app, currTime);
+            self.gameLoop(app);
         });
     }
 }
@@ -44,8 +41,8 @@ class EventHandler {
         this.action = action;
     }
 
-    handleEvent(time) {
-        this.action(time);
+    handleEvent() {
+        this.action();
     }
 }
 
@@ -55,9 +52,11 @@ class MyApp {
         this.gameStateManager = gameStateManager;
         this.transitionMap = {};
         this.currTime = 0;
+        this.startTime = 0;
     }
 
     begin() {
+        this.startTime = (new Date()).getTime();
         let playGameState = this.gameStateFactory.createState(GameStateConstants.PLAY_STATE, this);
         this.gameStateManager.setState(playGameState);
     }
@@ -66,9 +65,9 @@ class MyApp {
         this.gameStateManager.handleControls();
     }
 
-    update(currTime) {
-        this.currTime = currTime;
-        this.gameStateManager.update(currTime);
+    update() {
+        this.currTime = (((new Date()).getTime()) - this.startTime) / 1000;
+        this.gameStateManager.update(this.currTime);
     }
 
     render() {

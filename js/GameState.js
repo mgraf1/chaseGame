@@ -13,8 +13,7 @@ class GameOverState extends GameState {
 
     handleControls() { 
         if (this.controller.mouseUp && this.view.isInsideButton(this.controller.mouseLocation)) {
-            console.log("!");
-            this.controller.mouseUp = false;
+            this.app.begin();
         }
     }
 
