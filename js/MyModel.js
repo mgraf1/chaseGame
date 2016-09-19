@@ -1,7 +1,7 @@
 class MyModel {
-    constructor(collisionDetector, badGuyFactory, width, height, player, drawables) {
+    constructor(collisionDetector, badGuySpawner, width, height, player, drawables) {
         this.collisionDetector = collisionDetector;
-        this.badGuyFactory = badGuyFactory;
+        this.badGuySpawner = badGuySpawner;
         this.badGuys = [];
         this.player = player;
         this.width = width;
@@ -22,13 +22,10 @@ class MyModel {
 
     update(currTime) {
 
-        let timeUntilSpawn = currTime % MyModel.BAD_GUY_SPAWN_TIMER;
-        if (timeUntilSpawn < .1 && !this.recentlySpawned) {
-            this.spawnBadGuy();
-            this.recentlySpawned = true;
-        }
-        else if (timeUntilSpawn > MyModel.BAD_GUY_SPAWN_TIMER - 1) {
-            this.recentlySpawned = false;
+        if (this.badGuySpawner.canSpawn(currTime)) {
+            let badGuy = this.badGuySpawner.spawnBadGuy();
+            this.badGuys.push(badGuy);
+            this.drawables.push(badGuy);
         }
 
         this.collisionDetector.detectCollisions(this.drawables, currTime);
@@ -58,14 +55,8 @@ class MyModel {
     updateBadGuys() {
         this.badGuys.forEach(bg => bg.updatePosition());
     }
-
-    spawnBadGuy() {
-        var badGuy = this.badGuyFactory.createBadGuy("CHASE_BAD_GUY", this.width, this.height);
-        this.badGuys.push(badGuy);
-        this.drawables.push(badGuy);
-    }
 }
-MyModel. BAD_GUY_SPAWN_TIMER = 3;
+MyModel.BAD_GUY_SPAWN_TIMER = 3;
 
 class Player {
     constructor(sprite) {

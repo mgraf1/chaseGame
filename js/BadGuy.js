@@ -1,3 +1,29 @@
+class BadGuySpawner {
+    constructor(badGuyFactory, width, height) {
+        this.badGuyFactory = badGuyFactory;
+        this.recentlySpawned = true;
+        this.width = width;
+        this.height = height;
+    }
+
+    canSpawn(currTime) {
+        let timeUntilSpawn = currTime % BadGuySpawner.BAD_GUY_SPAWN_TIMER;
+        if (timeUntilSpawn < .1 && !this.recentlySpawned) {
+            return true;
+        }
+        else if (timeUntilSpawn > MyModel.BAD_GUY_SPAWN_TIMER - 1) {
+            this.recentlySpawned = false;
+        }
+    }
+
+    spawnBadGuy() {
+        let badGuy = this.badGuyFactory.createBadGuy("CHASE_BAD_GUY", this.width, this.height);
+        this.recentlySpawned = true;
+        return badGuy;
+    }
+}
+BadGuySpawner.BAD_GUY_SPAWN_TIMER = 3;
+
 class BadGuyFactory {
     constructor(player) {
         this.player = player;

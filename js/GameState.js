@@ -64,36 +64,40 @@ class GameStateFactory {
         if (state === GameStateConstants.PLAY_STATE) {
 
             // Starting parameters.
-            var PLAYER_START_X = 10;
-            var PLAYER_START_Y = 50;
-            var PLAYER_RADIUS = 10;
-            var PLAYER_START_SPEED = 2
-            var PLAYER_COLOR = 'white';
+            let PLAYER_START_X = 10;
+            let PLAYER_START_Y = 50;
+            let PLAYER_RADIUS = 10;
+            let PLAYER_START_SPEED = 2
+            let PLAYER_COLOR = 'white';
 
             // Game controller;
-            var controller = new MyController();
+            let controller = new MyController();
 
             // Game model.
-            var collisionHandler = new CollisionHandler();
-            var collisionDetector = new CollisionDetector(collisionHandler);
-            var playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS, PLAYER_COLOR);
-            var player = new Player(playerSprite);
-            var drawables = [player];
-            var badGuyFactory = new BadGuyFactory(player);
-            var model = new MyModel(collisionDetector, badGuyFactory, 
+            let collisionHandler = new CollisionHandler();
+            let collisionDetector = new CollisionDetector(collisionHandler);
+            let playerSprite = new CircularSprite(PLAYER_START_X, PLAYER_START_Y, PLAYER_START_SPEED, PLAYER_RADIUS, PLAYER_COLOR);
+            let player = new Player(playerSprite);
+            let drawables = [player];
+
+            let badGuyFactory = new BadGuyFactory(player);
+            let badGuySpawner = new BadGuySpawner(badGuyFactory, GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT);
+            
+
+            let model = new MyModel(collisionDetector, badGuySpawner, 
                 GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, 
                 player, drawables);
 
             // Game view.
-            var view = new MyView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT);
+            let view = new MyView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT);
 
             return new PlayGameState(model, view, controller, app);
 
         } else if (state === GameStateConstants.GAME_OVER_STATE) {
 
-            var view = new GameOverView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, time);
+            let view = new GameOverView(GameStateFactory.GAME_WIDTH, GameStateFactory.GAME_HEIGHT, time);
 
-            var controller = new GameOverController();
+            let controller = new GameOverController();
 
             return new GameOverState(controller, view, app);
         }
