@@ -4,6 +4,7 @@ class BadGuySpawner {
         this.recentlySpawned = true;
         this.width = width;
         this.height = height;
+        this.numSpawned = 0;
     }
 
     canSpawn(currTime) {
@@ -17,8 +18,14 @@ class BadGuySpawner {
     }
 
     spawnBadGuy() {
-        let badGuy = this.badGuyFactory.createBadGuy("CHASE_BAD_GUY", this.width, this.height);
+        let badGuy;
+        if (this.numSpawned > 0 && this.numSpawned % 4 === 0) {
+            badGuy = this.badGuyFactory.createBadGuy("TRACE_BAD_GUY", this.width, this.height);
+        } else {
+            badGuy = this.badGuyFactory.createBadGuy("CHASE_BAD_GUY", this.width, this.height);
+        }
         this.recentlySpawned = true;
+        this.numSpawned++;
         return badGuy;
     }
 }
@@ -29,13 +36,19 @@ class BadGuyFactory {
         this.player = player;
     }
     createBadGuy(badGuyType, maxWidth, maxHeight) {
-    if (badGuyType === "CHASE_BAD_GUY") {
+        
+        let x = Math.random() * maxWidth;
+        let y = Math.random() * maxHeight;
+        let baseSpeed = Math.random();
+        let badGuy;
+
+        if (badGuyType === "CHASE_BAD_GUY") {
 
             // Starting stats.
-            var x = Math.random() * maxWidth;
-            var y = Math.random() * maxHeight;
-            var speed = Math.random() * BadGuyFactory.CHASE_MAX_SPEED;
-            var radius = 10;
+            let x = Math.random() * maxWidth;
+            let y = Math.random() * maxHeight;
+            let speed = baseSpeed * BadGuyFactory.CHASE_MAX_SPEED;
+            let radius = 10;
 
             // Sprite.
             let spriteColor;
@@ -47,19 +60,36 @@ class BadGuyFactory {
             else {
                 spriteColor = 'red';
             }
-            var sprite = new CircularSprite(x, y, speed, radius, spriteColor);
+            let sprite = new CircularSprite(x, y, speed, radius, spriteColor);
 
             // Movement behavior (AI).
-            var movementBehavior = new ChaseMovementBehavior(sprite, this.player);
+            let movementBehavior = new ChaseMovementBehavior(sprite, this.player);
 
-            var badGuy = new ChaseBadGuy(sprite, movementBehavior);
-            return badGuy;
+            badGuy = new BadGuy(sprite, movementBehavior);
         }
+        else if (badGuyType === "TRACE_BAD_GUY") {
+            
+            let x2 = Math.random() * maxWidth;
+            let y2 = Math.random() * maxHeight;
+            let speed = baseSpeed * BadGuyFactory.TRACE_BONUS_SPEED;
+            speed += BadGuyFactory.TRACE_BASE_SPEED;
+            let spriteColor = 'yellow';
+            let radius = 15;
+
+            let sprite = new CircularSprite(x, y, speed, radius, spriteColor);
+            let movementBehavior = new TraceMovementBehavior(sprite, x2, y2);
+
+            badGuy = new BadGuy(sprite, movementBehavior);
+        }
+
+        return badGuy;
     }
 }
 BadGuyFactory.CHASE_MAX_SPEED = 1.9;
+BadGuyFactory.TRACE_BONUS_SPEED = 4.0;
+BadGuyFactory.TRACE_BASE_SPEED = 1.5;
 
-class ChaseBadGuy {
+class BadGuy {
     constructor(sprite, movementBehavior) {
         this.sprite = sprite;
         this.movementBehavior = movementBehavior;
@@ -84,6 +114,48 @@ class ChaseMovementBehavior extends BadGuyMovementBehavior {
     updatePosition() {
         let vecX = this.player.sprite.x - this.sprite.x;
         let vecY = this.player.sprite.y - this.sprite.y;
+
+        this.sprite.dX = vecX;
+        this.sprite.dY = vecY;
+        this.sprite.update();
+    }
+}
+
+class TraceMovementBehavior extends BadGuyMovementBehavior {
+    constructor(sprite, endX, endY) {
+        super();
+        this.sprite = sprite;
+        this.startX = sprite.x;
+        this.startY = sprite.y;
+        this.endX = endX;
+        this.endY = endY;
+
+        this.traceDist = Util.dist(this.startX, this.startY, this.endX, this.endY);
+        this.headingTowardsEndpoint = true;
+    }
+
+    updatePosition() {
+
+        let vecX = this.endX - this.startX;
+        let vecY = this.endY - this.startY;
+        
+        if (this.headingTowardsEndpoint) {
+
+            let currDist = Util.dist(this.sprite.x, this.sprite.y, this.endX, this.endY);
+            if (currDist<= this.sprite.radius || currDist > this.traceDist) {
+                this.headingTowardsEndpoint = false;
+            } 
+
+        } else {
+            vecX *= -1;
+            vecY *= -1;
+
+            let currDist = Util.dist(this.sprite.x, this.sprite.y, this.startX, this.startY);
+            if (currDist <= this.sprite.radius || currDist > this.traceDist) {
+                this.headingTowardsEndpoint = true;
+            }
+        }
+        
 
         this.sprite.dX = vecX;
         this.sprite.dY = vecY;
